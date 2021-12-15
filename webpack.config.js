@@ -1,22 +1,29 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const { join } = require('path');
+const { HotModuleReplacementPlugin } = require('webpack');
+
+const mode = process.env.ENV || 'development';
 
 module.exports = {
-	mode: 'development',
-	entry: path.join(__dirname, 'src', 'index.js'),
+	mode,
+	entry: join(__dirname, 'src', 'index.js'),
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path: join(__dirname, 'build'),
+		filename: 'index.bundled.js',
+	},
+	devServer: {
+		port: 4000,
+		hot: true,
+		open: true,
+		historyApiFallback: true,
 	},
 	module: {
 		rules: [
 			{
-				test: /\.?js$/,
-				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: ['@babel/preset-env', '@babel/preset-react'],
-					},
+				test: /\.(js|jsx)$/,
+				loader: 'babel-loader',
+				options: {
+					presets: ['@babel/preset-env', '@babel/preset-react'],
 				},
 			},
 			{
@@ -34,8 +41,12 @@ module.exports = {
 		],
 	},
 	plugins: [
-		new HtmlWebpackPlugin({
-			template: path.join(__dirname, 'src', 'index.html'),
+		new HotModuleReplacementPlugin(),
+		new HTMLWebpackPlugin({
+			favicon: false,
+			showErrors: true,
+			cache: true,
+			template: join(__dirname, 'src', 'index.html'),
 		}),
 	],
 };
